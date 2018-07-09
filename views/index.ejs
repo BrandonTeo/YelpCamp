@@ -1,0 +1,15 @@
+<!-- PARAMS: `posts` -->
+
+<%- include('partials/header.ejs') %>
+
+    <h1>JUST SOME TEXT</h1>
+    <a href="/camps/new">CLICK ME TO CREATE A NEW POST</a>
+    <% posts.forEach(function(post) { %>
+        <div><%= post.title %></div>
+        <div><img src="<%= post.image %>"></div>
+        <div><%= post.content %></div>
+        <a href="/camps/<%= post._id %>">READ MORE ABOUT ME</a>
+    <% }) %>
+
+<%- include('partials/footer.ejs') %>
+

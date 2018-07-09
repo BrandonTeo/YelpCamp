@@ -1,0 +1,16 @@
+<!-- PARAMS: `post` -->
+
+<%- include('partials/header.ejs') %>
+
+    <h1>EDIT POSTING HERE</h1>
+    <form action="/camps/<%= post._id %>?_method=PUT" method="POST">
+        <label>Title</label>
+        <input type="text" name="updatedPost[title]" value="<%= post.title %>">
+        <label>Image</label>
+        <input type="text" name="updatedPost[image]" value="<%= post.image %>">
+        <label>DESCRIPTION</label>
+        <input type="text" name="updatedPost[content]" value="<%= post.content %>">
+        <button type="submit">SUBMIT</button>
+    </form>
+
+<%- include('partials/footer.ejs') %>

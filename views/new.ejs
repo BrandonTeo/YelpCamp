@@ -1,0 +1,14 @@
+<%- include('partials/header.ejs') %>
+
+    <h1>CREATE A NEW POSTING HERE</h1>
+    <form action="/camps" method="POST">
+        <label>Title</label>
+        <input type="text" name="newPost[title]">
+        <label>Image</label>
+        <input type="text" name="newPost[image]">
+        <label>DESCRIPTION</label>
+        <input type="text" name="newPost[content]">
+        <button type="submit">SUBMIT</button>
+    </form>
+
+<%- include('partials/footer.ejs') %>

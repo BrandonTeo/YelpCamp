@@ -1,0 +1,13 @@
+<!-- PARAMS: `post` -->
+
+<%- include('partials/header.ejs') %>
+
+    <h1>SHOW PAGE</h1>
+    <div><%= post.title %></div>
+    <div><img src="<%= post.image %>"></div>
+    <div><%= post.content %></div>
+
+    <a href="/camps/<%= post._id %>/edit">EDIT THIS POST</a>
+    <form action="/camps/<%= post._id %>?_method=DELETE" method="POST"><button type="submit">DELETE THIS POST</button></form>
+
+<%- include('partials/footer.ejs') %>
