@@ -9,6 +9,17 @@
                     <div class="blog-title"><%= post.title %></div>
                     <div class="blog-content"><%= post.content %></div>
                     <div>Submitted by <%= post.author.username %></div>
+
+                    <% post.comments.forEach(function(comment) { %>
+                        <p><%= comment.author.username %> - <%= comment.content %></p>
+                        <% if(currUser && comment.author.id.equals(currUser._id)) { %>
+                            <div class="button-group">
+                                <a class="btn btn-outline-warning" href="/camps/<%= post._id %>/comments/<%= comment._id %>/edit">EditC</a>
+                                <form class="delete-inline" action="/camps/<%= post._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST"><button type="submit" class="btn btn-primary btn-outline-danger">DeleteC</button></form>
+                            </div>
+                        <% } %>
+                    <% }) %>
+
                     <% if(currUser && post.author.id.equals(currUser._id)) { %>
                         <div class="button-group">
                             <a class="btn btn-outline-warning" href="/camps/<%= post._id %>/edit">Edit</a>
@@ -19,5 +30,16 @@
             </div>
         </div>
     </div>
+
+    <!-- if currUser then show add comments form -->
+    <% if(currUser) { %>
+        <form action="/camps/<%= post._id %>/comments" method="POST">
+            <div class="form-group">
+                    <label>ADD A COMMENT</label>
+                    <textarea type="text" class="form-control"  rows="6" name="newComment[content]" required></textarea>
+                </div>
+            <button type="submit" class="submit-btn btn btn-primary">Submit</button>
+        </form>
+    <% } %>
 
 <%- include('partials/footer.ejs') %>

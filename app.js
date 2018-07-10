@@ -22,6 +22,19 @@ var UserSchema = new mongoose.Schema({
 UserSchema.plugin(passportLocalMongoose); // SUPERPOWER
 var User = mongoose.model("User", UserSchema);
 
+// Setup for comments collection
+var CommentSchema = new mongoose.Schema({
+    content: String,
+    author: {
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        },
+        username: String
+    }
+});
+var Comment = mongoose.model("Comment", CommentSchema);
+
 // Setup for campgrounds collection
 var postSchema = new mongoose.Schema({
     title: String,
@@ -33,7 +46,13 @@ var postSchema = new mongoose.Schema({
             ref: "User"
         },
         username: String
-    }
+    },
+    comments:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Comment"
+        }
+    ]
 });
 var Post = mongoose.model("Post", postSchema);
 
@@ -100,6 +119,77 @@ app.get('/logout', function(req, res) {
 });
 
 
+// COMMENT ROUTES -------------------------------------
+
+// CREATE route
+app.post('/camps/:id/comments', isLoggedIn, function(req, res) {
+    Post.findById(req.params.id, function(err, foundPost) {
+        if(err) {
+            console.log("Error occurred when trying to find post");
+            res.render('wrong');
+        } else {
+            var newComment = req.body.newComment;
+            newComment["author"] = {
+                id: req.user._id,
+                username: req.user.username
+            }
+            console.log(newComment);
+            Comment.create(newComment, function(err, createdComment) {
+                if(err) {
+                    console.log("Error occurred when trying to create comment");
+                    res.render('wrong');
+                } else {
+                    foundPost.comments.push(createdComment._id);
+                    foundPost.save()
+                    res.redirect('/camps/' + req.params.id);
+                }
+            });
+        }
+    });
+});
+
+// EDIT route
+app.get('/camps/:id/comments/:cid/edit', isCommentOwner, function(req, res) {
+    // Have to make sure post with id `:id` exists first
+    Comment.findById(req.params.cid, function(err, foundComment) {
+        if(err) {
+            console.log("Error occurred when trying to find the comment");
+            res.render('wrong');
+        } else {
+            res.render('commentEdit', {postID: req.params.id, comment: foundComment});
+        }
+    });
+});
+
+// UPDATE route
+app.put('/camps/:id/comments/:cid', isCommentOwner, function(req, res) {
+    Comment.findByIdAndUpdate(req.params.cid, req.body.updatedComment, function(err, updatedComment) {
+        if(err) {
+            console.log("Error occurred when trying to update comment");
+            res.render('wrong');
+        } else {
+            res.redirect('/camps/' + req.params.id);
+        }
+    });
+});
+
+// DESTROY route
+app.delete('/camps/:id/comments/:cid', isCommentOwner, function(req, res) {
+    Comment.findByIdAndRemove(req.params.cid, function(err, removedPost) {
+        if(err) {
+            console.log("Error occurred when trying to remove comment");
+            res.render('wrong');
+        } else {
+            res.redirect('/camps');
+        }
+    });
+});
+
+
+// -----------------------------------------------------
+
+
+
 // RESTFUL routes
 // Landing page
 app.get('/', function(req, res) {
@@ -145,11 +235,12 @@ app.post('/camps', isLoggedIn, function(req, res) {
 
 // SHOW route (!!!) SHOW route has to be after NEW route (!!!)
 app.get('/camps/:id', function(req, res) {
-    Post.findById(req.params.id, function(err, foundPost) {
+    Post.findById(req.params.id).populate("comments").exec(function(err, foundPost) {
         if(err) {
             console.log("Error occurred on the camp SHOW route");
             res.render('wrong');
         } else {
+            console.log(foundPost);
             res.render('show', {post: foundPost});
         }
     });
@@ -198,6 +289,7 @@ app.get('*', function(req, res) {
     res.render('nopage');
 });
 
+
 function isLoggedIn(req, res, next) {
     if(req.isAuthenticated()) {
         next();
@@ -213,6 +305,24 @@ function isPostOwner(req, res, next) {
                 console.log("Error occurred when trying to find post");
                 res.render('wrong');
             } else if(foundPost.author.id.equals(req.user._id)) {
+                next();
+            } else {
+                console.log("You don't have permission to perform this action");
+                res.render('wrong');
+            }
+        });
+    } else {
+        res.redirect('/login');
+    }
+}
+
+function isCommentOwner(req, res, next) {
+    if(req.isAuthenticated()) {
+        Comment.findById(req.params.cid, function(err, foundComment) {
+            if(err) {
+                console.log("Error occurred when trying to find comment");
+                res.render('wrong');
+            } else if(foundComment.author.id.equals(req.user._id)) {
                 next();
             } else {
                 console.log("You don't have permission to perform this action");
