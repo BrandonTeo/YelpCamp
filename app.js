@@ -5,9 +5,16 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
-// Setup mongoDB
+// Libraries required for user auth
+var passport = require("passport");
+var LocalStrategy = require("passport-local");
+var passportLocalMongoose = require("passport-local-mongoose");
+
+// Connect to mongoDB database for this application
 var dbName = 'yelpcamp_app';
 mongoose.connect('mongodb://localhost/' + dbName);
+
+// Setup for campgrounds collection
 var postSchema = new mongoose.Schema({
     title: String,
     content: String,
@@ -15,16 +22,76 @@ var postSchema = new mongoose.Schema({
 });
 var Post = mongoose.model("Post", postSchema);
 
-// Seed database
-// Post.create({title: "Camp1", content: "This is Camp1....", image: "https://i2.wp.com/beebom.com/wp-content/uploads/2016/01/Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg"});
-// Post.create({title: "Camp2", content: "This is Camp2....", image: "https://i2.wp.com/beebom.com/wp-content/uploads/2016/01/Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg"});
-// Post.create({title: "Camp3", content: "This is Camp3....", image: "https://i2.wp.com/beebom.com/wp-content/uploads/2016/01/Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg"});
+// Setup for users collection
+var UserSchema = new mongoose.Schema({
+    username: String,
+    password: String
+});
+UserSchema.plugin(passportLocalMongoose); // SUPERPOWER
+var User = mongoose.model("User", UserSchema);
 
 // Configure app.js settings
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
+app.use(require("express-session")({
+    secret: "Some-salt-here-is-fine",
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Initialize passportJS & create protocol
+app.use(passport.initialize());
+app.use(passport.session());
+var Protocol = new LocalStrategy(User.authenticate());
+
+// Assign the SUPERPOWER methods to passportJS to ready our bouncer
+passport.use(Protocol);
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+/* Configure app-wide middleware so that every route runs it. MUST BE PLACED AFTER 
+   `app.use(passport.initialize())` & `app.use(passport.session())` because we need 
+   to utilize the session-cookies in order to maintain state(?) */
+app.use(function(req, res, next) {
+    res.locals.currUser = req.user;
+    next();
+});
+
+// AUTH routes
+app.get('/register', function(req, res) {
+    res.render('register');
+});
+
+app.post('/register', function(req, res) {
+    var newUser = new User({username: req.body.username})
+    User.register(newUser, req.body.password, function(err, registeredUser) {
+        if(err) {
+            console.log("Error occurred when trying to register user");
+            res.redirect("/register");
+        } else {
+            passport.authenticate("local")(req, res, function() {
+                res.redirect("/camps");
+            });
+        }
+    });
+});
+
+app.get('/login', function(req, res) {
+    res.render('login');
+});
+
+app.post('/login', passport.authenticate("local", {
+    successRedirect: "/camps",
+    failureRedirect: "/login"
+}), function(req, res) {});
+
+app.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect("/camps");
+});
+
 
 // RESTFUL routes
 // Landing page

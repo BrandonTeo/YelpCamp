@@ -1,13 +1,20 @@
 <!-- PARAMS: `post` -->
-
 <%- include('partials/header.ejs') %>
 
-    <h1>SHOW PAGE</h1>
-    <div><%= post.title %></div>
-    <div><img src="<%= post.image %>"></div>
-    <div><%= post.content %></div>
-
-    <a href="/camps/<%= post._id %>/edit">EDIT THIS POST</a>
-    <form action="/camps/<%= post._id %>?_method=DELETE" method="POST"><button type="submit">DELETE THIS POST</button></form>
+    <div class="container">
+        <div class="inner container">
+            <div class="card border-info">
+                <img src="<%= post.image %>" class="card-img-top">
+                <div class="card-body">
+                    <div class="blog-title"><%= post.title %></div>
+                    <div class="blog-content"><%= post.content %></div>
+                    <div class="button-group">
+                        <a class="btn btn-outline-warning" href="/camps/<%= post._id %>/edit">Edit</a>
+                        <form class="delete-inline" action="/camps/<%= post._id %>?_method=DELETE" method="POST"><button type="submit" class="btn btn-primary btn-outline-danger">Delete</button></form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <%- include('partials/footer.ejs') %>

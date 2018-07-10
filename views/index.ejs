@@ -2,14 +2,33 @@
 
 <%- include('partials/header.ejs') %>
 
-    <h1>JUST SOME TEXT</h1>
-    <a href="/camps/new">CLICK ME TO CREATE A NEW POST</a>
-    <% posts.forEach(function(post) { %>
-        <div><%= post.title %></div>
-        <div><img src="<%= post.image %>"></div>
-        <div><%= post.content %></div>
-        <a href="/camps/<%= post._id %>">READ MORE ABOUT ME</a>
-    <% }) %>
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">Welcome to YelpCamp!</h1>
+            <p class="lead">Feel free to browse around and find the perfect camp!</p>
+        </div>
+    </div>
+
+    <div class=container>
+        <div class="row">
+            <% posts.forEach(function(post) { %>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card border-info">
+                        <img class="card-img-top img-thumbnail" src="<%= post.image %>">
+                        <div class="card-body">
+                            <div class="blog-title"><%= post.title %></div>
+                            <div class="blog-content"><%= post.content.substring(0, 200) %>
+                                <% if(post.content.length > 200) { %>
+                                    ...
+                                <% } %>
+                            </div>
+                            <a class="btn btn-outline-primary btn-sm" href="/camps/<%= post._id %>">READ MORE</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
 
 <%- include('partials/footer.ejs') %>
 

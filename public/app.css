@@ -1,0 +1,22 @@
+body {
+    margin: 100px 0;
+}
+
+.img-thumbnail {
+    width: 300px;
+}
+
+.inner {
+    border: 2px solid rgb(189, 186, 186);
+    border-radius: 1%;
+    padding: 0;
+}
+
+.button-group {
+    float: right;
+    margin-top: 80px;
+}
+
+.delete-inline {
+    display: inline;
+}
