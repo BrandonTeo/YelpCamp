@@ -8,53 +8,13 @@ var methodOverride = require('method-override');
 // Libraries required for user auth
 var passport = require("passport");
 var LocalStrategy = require("passport-local");
-var passportLocalMongoose = require("passport-local-mongoose");
 
-// Connect to mongoDB database for this application
+// Connect to mongoDB database and import models
 var dbName = 'yelpcamp_app';
 mongoose.connect('mongodb://localhost/' + dbName);
-
-// Setup for users collection
-var UserSchema = new mongoose.Schema({
-    username: String,
-    password: String
-});
-UserSchema.plugin(passportLocalMongoose); // SUPERPOWER
-var User = mongoose.model("User", UserSchema);
-
-// Setup for comments collection
-var CommentSchema = new mongoose.Schema({
-    content: String,
-    author: {
-        id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        },
-        username: String
-    }
-});
-var Comment = mongoose.model("Comment", CommentSchema);
-
-// Setup for campgrounds collection
-var postSchema = new mongoose.Schema({
-    title: String,
-    content: String,
-    image: String,
-    author: {
-        id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
-        },
-        username: String
-    },
-    comments:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Comment"
-        }
-    ]
-});
-var Post = mongoose.model("Post", postSchema);
+var User = require('./models/user');
+var Comment = require('./models/comment');
+var Post = require('./models/post');
 
 // Configure app.js settings
 app.set('view engine', 'ejs');
@@ -85,257 +45,28 @@ app.use(function(req, res, next) {
     next();
 });
 
-// AUTH routes
-app.get('/register', function(req, res) {
-    res.render('register');
-});
 
-app.post('/register', function(req, res) {
-    var newUser = new User({username: req.body.username})
-    User.register(newUser, req.body.password, function(err, registeredUser) {
-        if(err) {
-            console.log("Error occurred on the user CREATE route");
-            res.render('wrong');
-        } else {
-            passport.authenticate("local")(req, res, function() {
-                res.redirect("/camps");
-            });
-        }
-    });
-});
-
-app.get('/login', function(req, res) {
-    res.render('login');
-});
-
-app.post('/login', passport.authenticate("local", {
-    successRedirect: "/camps",
-    failureRedirect: "/login"
-}), function(req, res) {});
-
-app.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect("/camps");
-});
-
-
-// COMMENT ROUTES -------------------------------------
-
-// CREATE route
-app.post('/camps/:id/comments', isLoggedIn, function(req, res) {
-    Post.findById(req.params.id, function(err, foundPost) {
-        if(err) {
-            console.log("Error occurred when trying to find post");
-            res.render('wrong');
-        } else {
-            var newComment = req.body.newComment;
-            newComment["author"] = {
-                id: req.user._id,
-                username: req.user.username
-            }
-            console.log(newComment);
-            Comment.create(newComment, function(err, createdComment) {
-                if(err) {
-                    console.log("Error occurred when trying to create comment");
-                    res.render('wrong');
-                } else {
-                    foundPost.comments.push(createdComment._id);
-                    foundPost.save()
-                    res.redirect('/camps/' + req.params.id);
-                }
-            });
-        }
-    });
-});
-
-// EDIT route
-app.get('/camps/:id/comments/:cid/edit', isCommentOwner, function(req, res) {
-    // Have to make sure post with id `:id` exists first
-    Comment.findById(req.params.cid, function(err, foundComment) {
-        if(err) {
-            console.log("Error occurred when trying to find the comment");
-            res.render('wrong');
-        } else {
-            res.render('commentEdit', {postID: req.params.id, comment: foundComment});
-        }
-    });
-});
-
-// UPDATE route
-app.put('/camps/:id/comments/:cid', isCommentOwner, function(req, res) {
-    Comment.findByIdAndUpdate(req.params.cid, req.body.updatedComment, function(err, updatedComment) {
-        if(err) {
-            console.log("Error occurred when trying to update comment");
-            res.render('wrong');
-        } else {
-            res.redirect('/camps/' + req.params.id);
-        }
-    });
-});
-
-// DESTROY route
-app.delete('/camps/:id/comments/:cid', isCommentOwner, function(req, res) {
-    Comment.findByIdAndRemove(req.params.cid, function(err, removedPost) {
-        if(err) {
-            console.log("Error occurred when trying to remove comment");
-            res.render('wrong');
-        } else {
-            res.redirect('/camps');
-        }
-    });
-});
-
-
-// -----------------------------------------------------
-
-
-
-// RESTFUL routes
+// --------------- App Routes --------------- //
 // Landing page
 app.get('/', function(req, res) {
     // Redirect this route to the INDEX route for now
     res.redirect('/camps');
 });
 
-// INDEX route
-app.get('/camps', function(req, res) {
-    Post.find({}, function(err, foundPosts) {
-        if(err) {
-            console.log("Error occurred on the camp INDEX route");
-            res.render('wrong');
-        } else {
-            res.render('index', {posts: foundPosts});
-        }
-    });
-});
-
-// NEW route
-app.get('/camps/new', isLoggedIn, function(req, res) {
-    // Simply render the `new` form
-    res.render('new');
-});
-
-// CREATE route
-app.post('/camps', isLoggedIn, function(req, res) {
-    var newPost = req.body.newPost;
-    newPost["author"] = {
-        id: req.user._id,
-        username: req.user.username
-    }
-    Post.create(newPost, function(err, createdPost) {
-        if(err) {
-            console.log("Error occurred on the camp CREATE route");
-            res.render('wrong');
-        } else {
-            // Redirects to the SHOW page of the newly added post
-            res.redirect('/camps/' + createdPost._id);
-        }
-    });
-});
-
-// SHOW route (!!!) SHOW route has to be after NEW route (!!!)
-app.get('/camps/:id', function(req, res) {
-    Post.findById(req.params.id).populate("comments").exec(function(err, foundPost) {
-        if(err) {
-            console.log("Error occurred on the camp SHOW route");
-            res.render('wrong');
-        } else {
-            console.log(foundPost);
-            res.render('show', {post: foundPost});
-        }
-    });
-});
-
-// EDIT route
-app.get('/camps/:id/edit', isPostOwner, function(req, res) {
-    // Have to make sure post with id `:id` exists first
-    Post.findById(req.params.id, function(err, foundPost) {
-        if(err) {
-            console.log("Error occurred on the camp EDIT route");
-            res.render('wrong');
-        } else {
-            res.render('edit', {post: foundPost});
-        }
-    });
-});
-
-// UPDATE route
-app.put('/camps/:id', isPostOwner, function(req, res) {
-    Post.findByIdAndUpdate(req.params.id, req.body.updatedPost, function(err, updatedPost) {
-        if(err) {
-            console.log("Error occurred on the camp UPDATE route");
-            res.render('wrong');
-        } else {
-            res.redirect('/camps/' + updatedPost._id);
-        }
-    });
-});
-
-// DESTROY route
-app.delete('/camps/:id', isPostOwner, function(req, res) {
-    Post.findByIdAndRemove(req.params.id, function(err, removedPost) {
-        if(err) {
-            console.log("Error occurred on the camp DESTROY route");
-            res.render('wrong');
-        } else {
-            res.redirect('/camps');
-        }
-    });
-});
+// Import route modules
+app.use('/', require('./routes/authRoutes'));
+app.use('/', require('./routes/postRoutes'));
+app.use("/", require('./routes/commentRoutes'));
 
 // Route not available
 app.get('*', function(req, res) {
     console.log("Attempt to access non-existent route");
     res.render('nopage');
 });
+// ------------------------------------------ //
 
-
-function isLoggedIn(req, res, next) {
-    if(req.isAuthenticated()) {
-        next();
-    } else {
-        res.redirect('/login');
-    }
-}
-
-function isPostOwner(req, res, next) {
-    if(req.isAuthenticated()) {
-        Post.findById(req.params.id, function(err, foundPost) {
-            if(err) {
-                console.log("Error occurred when trying to find post");
-                res.render('wrong');
-            } else if(foundPost.author.id.equals(req.user._id)) {
-                next();
-            } else {
-                console.log("You don't have permission to perform this action");
-                res.render('wrong');
-            }
-        });
-    } else {
-        res.redirect('/login');
-    }
-}
-
-function isCommentOwner(req, res, next) {
-    if(req.isAuthenticated()) {
-        Comment.findById(req.params.cid, function(err, foundComment) {
-            if(err) {
-                console.log("Error occurred when trying to find comment");
-                res.render('wrong');
-            } else if(foundComment.author.id.equals(req.user._id)) {
-                next();
-            } else {
-                console.log("You don't have permission to perform this action");
-                res.render('wrong');
-            }
-        });
-    } else {
-        res.redirect('/login');
-    }
-}
 
 // Listen to port 5555
 app.listen(5555, function(req, res) {
     console.log("Server has started...");
 });
-
