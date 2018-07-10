@@ -8,10 +8,13 @@
                 <div class="card-body">
                     <div class="blog-title"><%= post.title %></div>
                     <div class="blog-content"><%= post.content %></div>
-                    <div class="button-group">
-                        <a class="btn btn-outline-warning" href="/camps/<%= post._id %>/edit">Edit</a>
-                        <form class="delete-inline" action="/camps/<%= post._id %>?_method=DELETE" method="POST"><button type="submit" class="btn btn-primary btn-outline-danger">Delete</button></form>
-                    </div>
+                    <div>Submitted by <%= post.author.username %></div>
+                    <% if(currUser && post.author.id.equals(currUser._id)) { %>
+                        <div class="button-group">
+                            <a class="btn btn-outline-warning" href="/camps/<%= post._id %>/edit">Edit</a>
+                            <form class="delete-inline" action="/camps/<%= post._id %>?_method=DELETE" method="POST"><button type="submit" class="btn btn-primary btn-outline-danger">Delete</button></form>
+                        </div>
+                    <% } %>
                 </div>
             </div>
         </div>

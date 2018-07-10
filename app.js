@@ -14,14 +14,6 @@ var passportLocalMongoose = require("passport-local-mongoose");
 var dbName = 'yelpcamp_app';
 mongoose.connect('mongodb://localhost/' + dbName);
 
-// Setup for campgrounds collection
-var postSchema = new mongoose.Schema({
-    title: String,
-    content: String,
-    image: String
-});
-var Post = mongoose.model("Post", postSchema);
-
 // Setup for users collection
 var UserSchema = new mongoose.Schema({
     username: String,
@@ -29,6 +21,21 @@ var UserSchema = new mongoose.Schema({
 });
 UserSchema.plugin(passportLocalMongoose); // SUPERPOWER
 var User = mongoose.model("User", UserSchema);
+
+// Setup for campgrounds collection
+var postSchema = new mongoose.Schema({
+    title: String,
+    content: String,
+    image: String,
+    author: {
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        },
+        username: String
+    }
+});
+var Post = mongoose.model("Post", postSchema);
 
 // Configure app.js settings
 app.set('view engine', 'ejs');
@@ -113,14 +120,19 @@ app.get('/camps', function(req, res) {
 });
 
 // NEW route
-app.get('/camps/new', function(req, res) {
+app.get('/camps/new', isLoggedIn, function(req, res) {
     // Simply render the `new` form
     res.render('new');
 });
 
 // CREATE route
-app.post('/camps', function(req, res) {
-    Post.create(req.body.newPost, function(err, createdPost) {
+app.post('/camps', isLoggedIn, function(req, res) {
+    var newPost = req.body.newPost;
+    newPost["author"] = {
+        id: req.user._id,
+        username: req.user.username
+    }
+    Post.create(newPost, function(err, createdPost) {
         if(err) {
             console.log("Error occurred on the camp CREATE route");
             res.render('wrong');
@@ -144,7 +156,7 @@ app.get('/camps/:id', function(req, res) {
 });
 
 // EDIT route
-app.get('/camps/:id/edit', function(req, res) {
+app.get('/camps/:id/edit', isPostOwner, function(req, res) {
     // Have to make sure post with id `:id` exists first
     Post.findById(req.params.id, function(err, foundPost) {
         if(err) {
@@ -157,7 +169,7 @@ app.get('/camps/:id/edit', function(req, res) {
 });
 
 // UPDATE route
-app.put('/camps/:id', function(req, res) {
+app.put('/camps/:id', isPostOwner, function(req, res) {
     Post.findByIdAndUpdate(req.params.id, req.body.updatedPost, function(err, updatedPost) {
         if(err) {
             console.log("Error occurred on the camp UPDATE route");
@@ -169,7 +181,7 @@ app.put('/camps/:id', function(req, res) {
 });
 
 // DESTROY route
-app.delete('/camps/:id', function(req, res) {
+app.delete('/camps/:id', isPostOwner, function(req, res) {
     Post.findByIdAndRemove(req.params.id, function(err, removedPost) {
         if(err) {
             console.log("Error occurred on the camp DESTROY route");
@@ -185,6 +197,32 @@ app.get('*', function(req, res) {
     console.log("Attempt to access non-existent route");
     res.render('nopage');
 });
+
+function isLoggedIn(req, res, next) {
+    if(req.isAuthenticated()) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+function isPostOwner(req, res, next) {
+    if(req.isAuthenticated()) {
+        Post.findById(req.params.id, function(err, foundPost) {
+            if(err) {
+                console.log("Error occurred when trying to find post");
+                res.render('wrong');
+            } else if(foundPost.author.id.equals(req.user._id)) {
+                next();
+            } else {
+                console.log("You don't have permission to perform this action");
+                res.render('wrong');
+            }
+        });
+    } else {
+        res.redirect('/login');
+    }
+}
 
 // Listen to port 5555
 app.listen(5555, function(req, res) {
