@@ -68,8 +68,8 @@ app.post('/register', function(req, res) {
     var newUser = new User({username: req.body.username})
     User.register(newUser, req.body.password, function(err, registeredUser) {
         if(err) {
-            console.log("Error occurred when trying to register user");
-            res.redirect("/register");
+            console.log("Error occurred on the user CREATE route");
+            res.render('wrong');
         } else {
             passport.authenticate("local")(req, res, function() {
                 res.redirect("/camps");
@@ -104,7 +104,8 @@ app.get('/', function(req, res) {
 app.get('/camps', function(req, res) {
     Post.find({}, function(err, foundPosts) {
         if(err) {
-            console.log("Error occurred on the INDEX route");
+            console.log("Error occurred on the camp INDEX route");
+            res.render('wrong');
         } else {
             res.render('index', {posts: foundPosts});
         }
@@ -121,7 +122,8 @@ app.get('/camps/new', function(req, res) {
 app.post('/camps', function(req, res) {
     Post.create(req.body.newPost, function(err, createdPost) {
         if(err) {
-            console.log("Error occurred on the CREATED route");
+            console.log("Error occurred on the camp CREATE route");
+            res.render('wrong');
         } else {
             // Redirects to the SHOW page of the newly added post
             res.redirect('/camps/' + createdPost._id);
@@ -133,7 +135,8 @@ app.post('/camps', function(req, res) {
 app.get('/camps/:id', function(req, res) {
     Post.findById(req.params.id, function(err, foundPost) {
         if(err) {
-            console.log("Error occurred on the SHOW route");
+            console.log("Error occurred on the camp SHOW route");
+            res.render('wrong');
         } else {
             res.render('show', {post: foundPost});
         }
@@ -145,7 +148,8 @@ app.get('/camps/:id/edit', function(req, res) {
     // Have to make sure post with id `:id` exists first
     Post.findById(req.params.id, function(err, foundPost) {
         if(err) {
-            console.log("Error occurred on the EDIT route");
+            console.log("Error occurred on the camp EDIT route");
+            res.render('wrong');
         } else {
             res.render('edit', {post: foundPost});
         }
@@ -156,7 +160,8 @@ app.get('/camps/:id/edit', function(req, res) {
 app.put('/camps/:id', function(req, res) {
     Post.findByIdAndUpdate(req.params.id, req.body.updatedPost, function(err, updatedPost) {
         if(err) {
-            console.log("Error occurred on the UPDATE route");
+            console.log("Error occurred on the camp UPDATE route");
+            res.render('wrong');
         } else {
             res.redirect('/camps/' + updatedPost._id);
         }
@@ -167,7 +172,8 @@ app.put('/camps/:id', function(req, res) {
 app.delete('/camps/:id', function(req, res) {
     Post.findByIdAndRemove(req.params.id, function(err, removedPost) {
         if(err) {
-            console.log("Error occurred on the DESTROY route");
+            console.log("Error occurred on the camp DESTROY route");
+            res.render('wrong');
         } else {
             res.redirect('/camps');
         }
@@ -176,7 +182,8 @@ app.delete('/camps/:id', function(req, res) {
 
 // Route not available
 app.get('*', function(req, res) {
-    res.send("The file you requested isn't available");
+    console.log("Attempt to access non-existent route");
+    res.render('nopage');
 });
 
 // Listen to port 5555
