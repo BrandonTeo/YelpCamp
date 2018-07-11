@@ -11,8 +11,7 @@ var passport = require("passport");
 var LocalStrategy = require("passport-local");
 
 // Connect to mongoDB database and import models
-var dbName = 'yelpcamp_app';
-mongoose.connect('mongodb://localhost/' + dbName);
+mongoose.connect(process.env.DATABASEURL);
 var User = require('./models/user');
 var Comment = require('./models/comment');
 var Post = require('./models/post');
@@ -70,7 +69,6 @@ app.get('*', function(req, res) {
 // ------------------------------------------ //
 
 
-// Listen to port 5555
-app.listen(5555, function(req, res) {
+app.listen(process.env.PORT, process.env.IP, function(req, res) {
     console.log("Server has started...");
 });
