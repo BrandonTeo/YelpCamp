@@ -7,8 +7,8 @@ var middleware = require('./middleware');
 router.get('/camps', function(req, res) {
     Post.find({}, function(err, foundPosts) {
         if(err) {
-            console.log("Error occurred on the camp INDEX route");
-            res.render('wrong');
+            req.flash('error', "Unable to retrieve listings from database.")
+            res.redirect('back');
         } else {
             res.render('posts/index', {posts: foundPosts});
         }
@@ -30,8 +30,8 @@ router.post('/camps', middleware.isLoggedIn, function(req, res) {
     }
     Post.create(newPost, function(err, createdPost) {
         if(err) {
-            console.log("Error occurred on the camp CREATE route");
-            res.render('wrong');
+            req.flash('error', "Unable to create listing.");
+            res.redirect('back');
         } else {
             // Redirects to the SHOW page of the newly added post
             res.redirect('/camps/' + createdPost._id);
@@ -43,8 +43,8 @@ router.post('/camps', middleware.isLoggedIn, function(req, res) {
 router.get('/camps/:id', function(req, res) {
     Post.findById(req.params.id).populate("comments").exec(function(err, foundPost) {
         if(err) {
-            console.log("Error occurred on the camp SHOW route");
-            res.render('wrong');
+            req.flash('error', "Unable to find listing.");
+            res.redirect('back');
         } else {
             res.render('posts/show', {post: foundPost});
         }
@@ -56,8 +56,8 @@ router.get('/camps/:id/edit', middleware.isPostOwner, function(req, res) {
     // Have to make sure post with id `:id` exists first
     Post.findById(req.params.id, function(err, foundPost) {
         if(err) {
-            console.log("Error occurred on the camp EDIT route");
-            res.render('wrong');
+            req.flash('error', "Unable to find listing.");
+            res.redirect('back');
         } else {
             res.render('posts/edit', {post: foundPost});
         }
@@ -68,9 +68,10 @@ router.get('/camps/:id/edit', middleware.isPostOwner, function(req, res) {
 router.put('/camps/:id', middleware.isPostOwner, function(req, res) {
     Post.findByIdAndUpdate(req.params.id, req.body.updatedPost, function(err, updatedPost) {
         if(err) {
-            console.log("Error occurred on the camp UPDATE route");
-            res.render('wrong');
+            req.flash('error', "Unable to update listing.");
+            res.redirect('back');
         } else {
+            req.flash('success', "Successfully updated listing.");
             res.redirect('/camps/' + updatedPost._id);
         }
     });
@@ -80,9 +81,10 @@ router.put('/camps/:id', middleware.isPostOwner, function(req, res) {
 router.delete('/camps/:id', middleware.isPostOwner, function(req, res) {
     Post.findByIdAndRemove(req.params.id, function(err, removedPost) {
         if(err) {
-            console.log("Error occurred on the camp DESTROY route");
-            res.render('wrong');
+            req.flash('error', "Unable to delete listing.");
+            res.redirect('back');
         } else {
+            req.flash('success', "Successfully deleted listing.");
             res.redirect('/camps');
         }
     });

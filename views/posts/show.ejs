@@ -112,13 +112,13 @@
                                             <div>
                                                 <strong><%= comment.author.username %></strong>
                                                 <span class="edit-btn-group">
-                                                    <a href="" data-toggle="modal" data-target="#modalCommentEditForm"><i class="fas fa-edit edit-icon fa-sm"></i></a>
-                                                    <a href="" data-toggle="modal" data-target="#modalCommentDeleteForm"><i class="fas fa-trash-alt delete-icon fa-sm"></i></a>
+                                                    <a href="" data-toggle="modal" data-target="#modalCommentEditForm<%= comment._id %>"><i class="fas fa-edit edit-icon fa-sm"></i></a>
+                                                    <a href="" data-toggle="modal" data-target="#modalCommentDeleteForm<%= comment._id %>"><i class="fas fa-trash-alt delete-icon fa-sm"></i></a>
                                                 </span>
                                             </div>
     
                                             <!-- modalCommentDeleteForm template -->
-                                            <div class="modal fade" id="modalCommentDeleteForm" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                            <div class="modal fade" id="modalCommentDeleteForm<%= comment._id %>" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -139,7 +139,7 @@
                                             </div>
     
                                             <!-- modalCommentEditForm template -->
-                                            <div class="modal fade" id="modalCommentEditForm" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                                            <div class="modal fade" id="modalCommentEditForm<%= comment._id %>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -170,20 +170,25 @@
                                 </div>
                             <% }) %>
                         </div>
+
+                        <hr>
     
                         <!-- If there is a user logged in, we display the add comment box -->
-                        <% if(currUser) { %>
-                            <hr>
-                            <div class="add-comment">
-                                <form action="/camps/<%= post._id %>/comments" method="POST">
-                                    <div class="form-group">
-                                        <label>Leave a comment:</label>
-                                        <textarea type="text" class="form-control"  rows="3" name="newComment[content]" required></textarea>
-                                    </div>
+                        <div class="add-comment">
+                            <form action="/camps/<%= post._id %>/comments" method="POST">
+                                <div class="form-group">
+                                    <label>Leave a comment:</label>
+                                <% if(currUser) { %>
+                                    <textarea type="text" class="form-control"  rows="3" name="newComment[content]" required></textarea>
+                                </div>
                                     <button type="submit" class="btn btn-primary">Submit</button>
-                                </form>
-                            </div>
-                        <% } %>
+                                <% } else { %>
+                                    <textarea type="text" class="form-control"  rows="3" disabled>Login to leave a comment</textarea>
+                                </div>
+                                    <button type="submit" class="btn btn-primary" disabled>Submit</button>
+                                <% } %>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

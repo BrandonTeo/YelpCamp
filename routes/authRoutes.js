@@ -14,11 +14,12 @@ router.post('/register', function(req, res) {
     var newUser = new User({username: req.body.username})
     User.register(newUser, req.body.password, function(err, registeredUser) {
         if(err) {
-            console.log("Error occurred on the user CREATE route");
-            res.render('wrong');
+            req.flash('error', err.message + '.');
+            res.redirect('back');
         } else {
             passport.authenticate("local")(req, res, function() {
-                res.redirect("/camps");
+                req.flash('success', "Successfully signed up.")
+                res.redirect('back');
             });
         }
     });
@@ -33,6 +34,7 @@ router.post('/login', passport.authenticate("local", {
 // Logout current session user
 router.get('/logout', function(req, res) {
     req.logout();
+    req.flash('success', "Successfully logged out.");
     res.redirect("back");
 });
 

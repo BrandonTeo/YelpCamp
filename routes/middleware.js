@@ -7,7 +7,8 @@ middleware["isLoggedIn"] = function(req, res, next) {
     if(req.isAuthenticated()) {
         next();
     } else {
-        res.redirect('/authenticate');
+        req.flash('error', "You need to be logged in to do that.");
+        res.redirect('/camps');
     }
 }
 
@@ -17,17 +18,18 @@ middleware["isPostOwner"] = function(req, res, next) {
     if(req.isAuthenticated()) {
         Post.findById(req.params.id, function(err, foundPost) {
             if(err) {
-                console.log("Error occurred when trying to find post");
-                res.render('wrong');
+                req.flash('error', "Unable to find post in database.");
+                res.redirect('back');
             } else if(foundPost.author.id.equals(req.user._id)) {
                 next();
             } else {
-                console.log("You don't have permission to perform this action");
-                res.render('wrong');
+                req.flash('error', "You don't have permission to do that.");
+                res.redirect('back');
             }
         });
     } else {
-        res.redirect('/authenticate');
+        req.flash('error', "You don't have permission to do that.");
+        res.redirect('back');
     }
 }
 
@@ -37,17 +39,18 @@ middleware["isCommentOwner"] = function(req, res, next) {
     if(req.isAuthenticated()) {
         Comment.findById(req.params.cid, function(err, foundComment) {
             if(err) {
-                console.log("Error occurred when trying to find comment");
-                res.render('wrong');
+                req.flash('error', "Unable to find comment in database.");
+                res.redirect('back');
             } else if(foundComment.author.id.equals(req.user._id)) {
                 next();
             } else {
-                console.log("You don't have permission to perform this action");
-                res.render('wrong');
+                req.flash('error', "You don't have permission to do that.");
+                res.redirect('back');
             }
         });
     } else {
-        res.redirect('/authenticate');
+        req.flash('error', "You don't have permission to do that.");
+        res.redirect('back');
     }
 }
 

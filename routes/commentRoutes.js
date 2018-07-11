@@ -8,8 +8,8 @@ var middleware = require('./middleware');
 router.post('/camps/:id/comments', middleware.isLoggedIn, function(req, res) {
     Post.findById(req.params.id, function(err, foundPost) {
         if(err) {
-            console.log("Error occurred when trying to find post");
-            res.render('wrong');
+            req.flash('error', "Unable to find listing.");
+            res.redirect('back');
         } else {
             var newComment = req.body.newComment;
             newComment["author"] = {
@@ -18,8 +18,8 @@ router.post('/camps/:id/comments', middleware.isLoggedIn, function(req, res) {
             }
             Comment.create(newComment, function(err, createdComment) {
                 if(err) {
-                    console.log("Error occurred when trying to create comment");
-                    res.render('wrong');
+                    req.flash('error', "Unable to create comment.");
+                    res.redirect('back');
                 } else {
                     foundPost.comments.push(createdComment._id);
                     foundPost.save()
@@ -35,8 +35,8 @@ router.get('/camps/:id/comments/:cid/edit', middleware.isCommentOwner, function(
     // Have to make sure post with id `:id` exists first
     Comment.findById(req.params.cid, function(err, foundComment) {
         if(err) {
-            console.log("Error occurred when trying to find the comment");
-            res.render('wrong');
+            req.flash('error', "Unable to find comment.");
+            res.redirect('back');
         } else {
             res.render('comments/edit', {postID: req.params.id, comment: foundComment});
         }
@@ -47,9 +47,10 @@ router.get('/camps/:id/comments/:cid/edit', middleware.isCommentOwner, function(
 router.put('/camps/:id/comments/:cid', middleware.isCommentOwner, function(req, res) {
     Comment.findByIdAndUpdate(req.params.cid, req.body.updatedComment, function(err, updatedComment) {
         if(err) {
-            console.log("Error occurred when trying to update comment");
-            res.render('wrong');
+            req.flash('error', "Unable to update comment.");
+            res.redirect('back');
         } else {
+            req.flash('success', "Sucessfully updated comment.");
             res.redirect('/camps/' + req.params.id);
         }
     });
@@ -62,6 +63,7 @@ router.delete('/camps/:id/comments/:cid', middleware.isCommentOwner, function(re
             console.log("Error occurred when trying to remove comment");
             res.render('wrong');
         } else {
+            req.flash('success', "Sucessfully deleted comment.")
             res.redirect('/camps/' + req.params.id);
         }
     });

@@ -4,6 +4,7 @@ var app = express();
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
+var flash = require('connect-flash');
 
 // Libraries required for user auth
 var passport = require("passport");
@@ -26,6 +27,7 @@ app.use(require("express-session")({
     resave: false,
     saveUninitialized: false
 }));
+app.use(flash());
 
 // Initialize passportJS & create protocol
 app.use(passport.initialize());
@@ -42,6 +44,8 @@ passport.deserializeUser(User.deserializeUser());
    to utilize the session-cookies in order to maintain state(?) */
 app.use(function(req, res, next) {
     res.locals.currUser = req.user;
+    res.locals.error = req.flash('error');
+    res.locals.success = req.flash('success');
     next();
 });
 
@@ -60,8 +64,8 @@ app.use('/', require('./routes/commentRoutes'));
 
 // Route not available
 app.get('*', function(req, res) {
-    console.log("Attempt to access non-existent route");
-    res.render('nopage');
+    req.flash('error', "The page you're looking for doesn't exist.");
+    res.redirect('/camps');
 });
 // ------------------------------------------ //
 
