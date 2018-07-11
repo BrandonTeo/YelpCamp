@@ -1,0 +1,74 @@
+body {
+    background: black;
+}
+
+h1 {
+    margin-bottom: 20px;
+    text-shadow: 1px 1px black,
+                 1.5px 1.5px black;
+}
+
+.welcome-message {
+    text-align: center;
+    margin-top: 40vh;
+    position: relative;
+    z-index: 1;
+
+    color: white;
+}
+
+li {
+    list-style: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    opacity: 0;
+    z-index: 0;
+    animation: imageAnimation 50s linear infinite;
+}
+
+li:nth-of-type(1) {
+    background-image: url(http://i.imgur.com/K3mPv14.jpg);
+}
+
+li:nth-of-type(2) {
+    background-image: url(http://i.imgur.com/SBEmFpv.jpg);
+    animation-delay: 10s; 
+}
+
+li:nth-of-type(3) {
+    background-image: url(http://i.imgur.com/emvhOnb.jpg);
+    animation-delay: 20s; 
+}
+
+li:nth-of-type(4) {
+    background-image: url(http://i.imgur.com/2LSMCmJ.jpg);
+    animation-delay: 30s; 
+}
+
+li:nth-of-type(5) {
+    background-image: url(http://i.imgur.com/TVGe0Ef.jpg);
+    animation-delay: 40s; 
+}
+
+@keyframes imageAnimation { 
+    0% { 
+      opacity: 0; 
+      animation-timing-function: ease-in;
+    }
+    10% {
+      opacity: 1;
+      animation-timing-function: ease-out;
+    }
+    20% {
+      opacity: 1
+    }
+    30% {
+      opacity: 0
+    }
+}

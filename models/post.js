@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 // Setup for posts collection
 var postSchema = new mongoose.Schema({
     title: String,
+    price: String,
     content: String,
     image: String,
     author: {

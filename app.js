@@ -54,7 +54,7 @@ app.use(function(req, res, next) {
 // Landing page
 app.get('/', function(req, res) {
     // Redirect this route to the INDEX route for now
-    res.redirect('/camps');
+    res.render('landing');
 });
 
 // Import route modules

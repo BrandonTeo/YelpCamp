@@ -21,7 +21,10 @@
 
                         <!-- Listing portion of the SHOW card -->
                         <div class="listing">
-                            <div class="blog-title"><%= post.title %></div>
+                            <div class="d-flex">
+                                <div class="blog-title"><%= post.title %></div>
+                                <div class="ml-auto"><strong>$<%= post.price %> / night</strong></div>
+                            </div>
                             <div class="blog-content"><%= post.content %></div>
 
                             <!-- If logged in user is post author, we need to show edit/delete buttons -->
@@ -70,6 +73,10 @@
                                                     <div class="form-group">
                                                         <label>Title</label>
                                                         <input type="text" class="form-control" name="updatedPost[title]" value="<%= post.title %>" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Price</label>
+                                                        <input type="number" class="form-control" name="updatedPost[price]" value="<%= post.price %>" step="0.01" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>Image Source</label>
