@@ -13,26 +13,75 @@
 </head>
 <body>
 
-    <!-- Add a NavBar -->
+    <!-- NavBar * -->
     <nav class="navbar navbar-dark navbar-expand-md fixed-top" style="background-color: rgb(168, 70, 70);">
         <div class="container">
-            <div class="navbar-brand"><i class="far fa-bookmark"></i></div>  
+            <div class="navbar-brand"><i class="fab fa-free-code-camp fa-2x"></i></div>  
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#hamburger-stuff"><span class="navbar-toggler-icon"></span></button>
                 
             <div class="collapse navbar-collapse" id="hamburger-stuff">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/camps/new">New Post</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">- YelpCamp -</a></li>
                 </ul>
                 <ul class="navbar-nav">
-                    <!-- User auth. control flow -->
+                    <!-- If logged in, show current user and logout, otherwise show `modalUserForm` -->
                     <% if(currUser) { %>
-                        <li class="nav-item"><a class="nav-link" href="#"><%= currUser.username %></a></li>
-                        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#"><i class="far fa-laugh-squint"></i> <%= currUser.username %></a></li>
+                        <li class="nav-item"><a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                     <% } else { %>
-                        <li class="nav-item"><a class="nav-link" href="/register">Sign Up</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                        <li class="nav-item"><a href="" class="nav-link" data-toggle="modal" data-target="#modalUserForm">Signup <i class="fas fa-sign-in-alt"></i> Login</a></li>
                     <% } %>
             </div>
         </div>
     </nav>
+    <!-- END NavBar -->
+
+    <!-- modalUserForm template * -->
+    <div class="modal fade" id="modalUserForm" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title form-title-padding" id="userModalLabel">Signup/Login</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row vdivide">
+                        <div class="col-lg-6 form-body-padding">
+                            <form action="/register" method="POST">
+                                <div class="form-group">
+                                  <label for="loginName" class="col-form-label">Name:</label>
+                                  <input type="text" class="form-control" id="loginName" name="username" required>
+                                </div>
+                                <div class="form-group">
+                                  <label for="loginPassword" class="col-form-label">Password:</label>
+                                  <input type="password" class="form-control" id="loginPassword" name="password" required>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-6 form-body-padding">
+                            <form action="/login" method="POST">
+                                <div class="form-group">
+                                  <label for="loginName" class="col-form-label">Name:</label>
+                                  <input type="text" class="form-control" id="loginName" name="username" required>
+                                </div>
+                                <div class="form-group">
+                                  <label for="loginPassword" class="col-form-label">Password:</label>
+                                  <input type="password" class="form-control" id="loginPassword" name="password" required>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Login</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

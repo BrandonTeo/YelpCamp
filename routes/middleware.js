@@ -2,14 +2,17 @@ var Comment = require('../models/comment');
 var Post = require('../models/post');
 var middleware = {};
 
+// Checks if a user is currently logged in
 middleware["isLoggedIn"] = function(req, res, next) {
     if(req.isAuthenticated()) {
         next();
     } else {
-        res.redirect('/login');
+        res.redirect('/authenticate');
     }
 }
 
+// Checks if the current user is the owner of post
+// Not really used because we only show buttons if user is owner of post
 middleware["isPostOwner"] = function(req, res, next) {
     if(req.isAuthenticated()) {
         Post.findById(req.params.id, function(err, foundPost) {
@@ -24,10 +27,12 @@ middleware["isPostOwner"] = function(req, res, next) {
             }
         });
     } else {
-        res.redirect('/login');
+        res.redirect('/authenticate');
     }
 }
 
+// Checks if the current user is the owner of comment
+// Not really used because we only show buttons if user is owner of comment
 middleware["isCommentOwner"] = function(req, res, next) {
     if(req.isAuthenticated()) {
         Comment.findById(req.params.cid, function(err, foundComment) {
@@ -42,7 +47,7 @@ middleware["isCommentOwner"] = function(req, res, next) {
             }
         });
     } else {
-        res.redirect('/login');
+        res.redirect('/authenticate');
     }
 }
 

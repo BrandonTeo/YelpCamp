@@ -46,7 +46,6 @@ router.get('/camps/:id', function(req, res) {
             console.log("Error occurred on the camp SHOW route");
             res.render('wrong');
         } else {
-            console.log(foundPost);
             res.render('posts/show', {post: foundPost});
         }
     });

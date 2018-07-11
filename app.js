@@ -56,7 +56,7 @@ app.get('/', function(req, res) {
 // Import route modules
 app.use('/', require('./routes/authRoutes'));
 app.use('/', require('./routes/postRoutes'));
-app.use("/", require('./routes/commentRoutes'));
+app.use('/', require('./routes/commentRoutes'));
 
 // Route not available
 app.get('*', function(req, res) {

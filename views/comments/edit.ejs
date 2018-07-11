@@ -1,6 +1,8 @@
 <!-- PARAMS: `comment` & `postID` -->
 <%- include('../partials/header.ejs') %>
 
+    <!-- NOT USED (REPLACED BY MODAL) -->
+
     <div class="container">
         <div class="inner container">
             <div class="card border-info">
@@ -14,6 +16,7 @@
                         <button type="submit" class="submit-btn btn btn-primary">Submit</button>
                         <a class="btn btn-outline-warning" href="/camps/<%= postID %>/">Cancel</a>
                     </form>
+                    <form class="delete-inline" action="/camps/<%= postID %>/comments/<%= comment._id %>?_method=DELETE" method="POST"><button type="submit" class="btn btn-primary btn-outline-danger btn-sm">DeleteComment</button></form>
                 </div>
             </div>
         </div>

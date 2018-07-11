@@ -6,8 +6,6 @@ var middleware = require('./middleware');
 
 // CREATE route
 router.post('/camps/:id/comments', middleware.isLoggedIn, function(req, res) {
-    console.log("hey");
-    console.log(req.params);
     Post.findById(req.params.id, function(err, foundPost) {
         if(err) {
             console.log("Error occurred when trying to find post");
@@ -23,8 +21,6 @@ router.post('/camps/:id/comments', middleware.isLoggedIn, function(req, res) {
                     console.log("Error occurred when trying to create comment");
                     res.render('wrong');
                 } else {
-                    console.log("ho");
-                    console.log(foundPost);
                     foundPost.comments.push(createdComment._id);
                     foundPost.save()
                     res.redirect('/camps/' + req.params.id);
@@ -34,7 +30,7 @@ router.post('/camps/:id/comments', middleware.isLoggedIn, function(req, res) {
     });
 });
 
-// EDIT route
+// NOT USED (REPLACED BY MODAL)
 router.get('/camps/:id/comments/:cid/edit', middleware.isCommentOwner, function(req, res) {
     // Have to make sure post with id `:id` exists first
     Comment.findById(req.params.cid, function(err, foundComment) {
@@ -66,7 +62,7 @@ router.delete('/camps/:id/comments/:cid', middleware.isCommentOwner, function(re
             console.log("Error occurred when trying to remove comment");
             res.render('wrong');
         } else {
-            res.redirect('/camps');
+            res.redirect('/camps/' + req.params.id);
         }
     });
 });

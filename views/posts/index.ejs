@@ -1,31 +1,75 @@
 <!-- PARAMS: `posts` -->
 <%- include('../partials/header.ejs') %>
 
+    <!-- Jumbotron belongs here  * -->
     <div class="container">
         <div class="jumbotron">
-            <h1 class="display-4">Welcome to YelpCamp!</h1>
-            <p class="lead">Feel free to browse around and find the perfect camp!</p>
+            <h1 class="display-5">Welcome to YelpCamp!</h1>
+            <p class="lead">View our hand-picked campgrounds from all over the world</p>
+            <!-- If logged in, show `modalNewForm`, otherwise show `modalUserForm` -->
+            <% if(currUser) { %>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalNewForm"><i class="fas fa-pen-square"></i> Add New Listing</button>
+            <% } else { %>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalUserForm"><i class="fas fa-pen-square"></i> Add New Listing</button>
+            <% } %>
         </div>
     </div>
 
+    <!-- Listing all posts belong here * -->
     <div class=container>
         <div class="row">
             <% posts.forEach(function(post) { %>
                 <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="card border-info">
-                        <img class="card-img-top img-thumbnail" src="<%= post.image %>">
+                    <div class="card index-card">
+                        <img class="card-img-top" src="<%= post.image %>">
                         <div class="card-body">
                             <div class="blog-title"><%= post.title %></div>
-                            <div class="blog-content"><%= post.content.substring(0, 200) %>
+                            <div class="blog-content"><%= post.content.substring(0, 100) %>
                                 <% if(post.content.length > 200) { %>
                                     ...
                                 <% } %>
                             </div>
-                            <a class="btn btn-outline-primary btn-sm" href="/camps/<%= post._id %>">READ MORE</a>
+                            <a class="btn btn-primary btn-sm btn-margin" href="/camps/<%= post._id %>">READ MORE</a>
                         </div>
                     </div>
                 </div>
             <% }) %>
+        </div>
+    </div>
+
+    <!-- modalNewForm template * -->
+    <div class="modal fade" id="modalNewForm" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title form-title-padding" id="newModalLabel">Create New Listing</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12 form-body-padding">
+                            <form action="/camps" method="POST">
+                                <div class="form-group">
+                                    <label>Title</label>
+                                    <input type="text" class="form-control" name="newPost[title]" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Image Source</label>
+                                    <input type="text" class="form-control" name="newPost[image]" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea type="text" class="form-control"  rows="6" name="newPost[content]" required></textarea>
+                                </div>
+                                <button type="submit" class="submit-btn btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -1,22 +1,112 @@
 body {
     margin: 100px 0;
+    background: #FFEEEE;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #DDEFBB, #FFEEEE);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #DDEFBB, #FFEEEE); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-.img-thumbnail {
-    width: 300px;
+/* ----------------- INDEX PAGE STUFF ------------------- */
+.jumbotron {
+    color: white;
+    background: #DA4453;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #89216B, #DA4453);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #89216B, #DA4453); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-.inner {
-    border: 2px solid rgb(189, 186, 186);
-    border-radius: 1%;
-    padding: 0;
+.blog-title {
+    color: rgb(85, 85, 209);
+    font-weight: bold;
+    font-size: 20px;
 }
 
-.button-group {
+.blog-content {
+    font-size: 15px;
+}
+
+/* Spacing between the `READ MORE` button and the description in the index cards */
+.btn-margin {
+    margin-top: 25px;
+}
+
+.index-card {
+    margin-bottom: 30px;
+    background: rgb(246, 249, 250);
+}
+/* ------------------------------------------------------ */
+
+/* ------------------ SHOW PAGE STUFF ------------------- */
+.show-card {
+    background: rgb(246, 249, 250);
+}
+
+.show-card-submitted {
+    margin-top: 40px; /* RELATED */
     float: right;
-    margin-top: 80px;
 }
 
-.delete-inline {
-    display: inline;
+.listing {
+    padding: 0 15px;
+    padding-bottom: 70px; /* RELATED */
 }
+
+.comments {
+    background: #D3CCE3;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #E9E4F0, #D3CCE3);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #E9E4F0, #D3CCE3); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    padding: 15px;
+}
+
+.add-comment {
+    padding: 5px;
+}
+
+.comments-header {
+    font-weight: bold;
+    color: rgb(19, 91, 119);
+    margin-bottom: 15px;
+}
+
+.edit-btn-group {
+    margin-left: 5px;
+}
+
+.delete-icon {
+    color: rgb(219, 65, 65);
+}
+
+.edit-icon {
+    color: rgb(70, 70, 199);
+}
+
+hr {
+    margin: 25px 0;
+}
+/* ------------------------------------------------------ */
+
+/* ---------- FOR LOGIN, NEWPOST FORM & MODAL ------------ */
+.form-body-padding {
+    padding: 20px 30px;
+    padding-top: 5px;
+}
+
+.form-title-padding {
+    padding-left: 18px;
+}
+
+.row.vdivide [class*='col-']:not(:last-child):after {
+    background: #e0e0e0;
+    width: 1px;
+    content: "";
+    display:block;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    right: 0;
+    min-height: 70px;
+}
+
+.modal-footer {
+    float: left;
+}
+/* ------------------------------------------------------- */
+

@@ -3,9 +3,10 @@ var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
 
-// Render `register` page
-router.get('/register', function(req, res) {
-    res.render('auth/register');
+// Render `register/login` page
+// NOT USED (REPLACED BY MODAL)
+router.get('/authenticate', function(req, res) {
+    res.render('auth/authentication');
 });
 
 // Register new user and authenticate new user
@@ -23,21 +24,16 @@ router.post('/register', function(req, res) {
     });
 });
 
-// Render `login` page
-router.get('/login', function(req, res) {
-    res.render('auth/login');
-});
-
 // Authenticate `login` form
 router.post('/login', passport.authenticate("local", {
-    successRedirect: "/camps",
-    failureRedirect: "/login"
+    successRedirect: "back",
+    failureRedirect: "back"
 }), function(req, res) {});
 
 // Logout current session user
 router.get('/logout', function(req, res) {
     req.logout();
-    res.redirect("/camps");
+    res.redirect("back");
 });
 
 module.exports = router;
